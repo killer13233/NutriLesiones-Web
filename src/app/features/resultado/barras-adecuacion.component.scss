@@ -1,0 +1,21 @@
+:host { display: block; }
+.cabecera { display: flex; align-items: center; gap: .2rem; h3 { margin: 0; font-size: 1.15rem; } }
+.leyenda { display: flex; align-items: center; gap: .5rem; margin: .2rem 0 1rem; font-size: .84rem; color: var(--tinta-suave); }
+.muestra { width: 1.6rem; height: .7rem; border-radius: 2px; background: color-mix(in srgb, var(--verde-lima) 45%, var(--papel)); border: 1px solid var(--verde-hoja); }
+
+.fila { margin-bottom: 1rem; }
+.datos { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; margin-bottom: .2rem; }
+.etiqueta { font-weight: 700; }
+.cifras { font-size: .88rem; color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+
+.pista { position: relative; height: .95rem; margin-top: 1.35rem; border-bottom: 1px solid var(--borde); background: linear-gradient(var(--borde), var(--borde)) bottom / 100% 1px no-repeat; }
+.zona { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--verde-lima) 45%, var(--papel)); border-left: 1px solid var(--verde-hoja); border-right: 1px solid var(--verde-hoja); }
+.marcador { position: absolute; top: -.2rem; bottom: -.2rem; width: 3px; margin-left: -1.5px; background: var(--verde-bosque); border-radius: 2px; }
+.valor {
+  position: absolute; bottom: calc(100% + .1rem); left: 50%; transform: translateX(-50%);
+  font-size: .8rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--verde-bosque);
+}
+.fuera .marcador { background: var(--terracota); }
+.fuera .valor { color: var(--terracota-texto); }
+.estado { margin: .25rem 0 0; font-size: .78rem; color: var(--tinta-suave); }
+.fuera .estado { color: var(--terracota-texto); font-weight: 700; }

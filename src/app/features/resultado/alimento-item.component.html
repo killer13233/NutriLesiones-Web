@@ -1,0 +1,59 @@
+<article class="alimento">
+  <div class="foto" [class.sin-foto]="!foto()">
+    @if (foto(); as src) {
+      <img [src]="src" [alt]="alimento().nombre" width="480" height="312" loading="lazy" decoding="async"
+           (error)="fotoFallida.set(true)" />
+    } @else {
+      <span class="vacio" role="img" [attr.aria-label]="'Sin foto de ' + alimento().nombre">Sin foto</span>
+    }
+    @if (alimento().fotoReferencia && foto()) {
+      <span class="referencia" tabindex="0" [attr.title]="alimento().fotoReferencia"
+            [attr.aria-label]="'Foto de referencia. ' + alimento().fotoReferencia">Foto de referencia</span>
+    }
+  </div>
+
+  <div class="cuerpo">
+    <h4 class="nombre">{{ alimento().nombre }}</h4>
+    <p class="porciones">{{ porciones() }}</p>
+    <p class="medida">Cada porción: {{ alimento().medidaPorPorcion }} ({{ peso() }})</p>
+    @if (alimento().nota) { <p class="nota">{{ alimento().nota }}</p> }
+
+    <div class="acciones">
+      @if (alimento().alternativas.length > 0) {
+        <button type="button" class="btn-texto" [attr.aria-expanded]="abierto()" [attr.aria-controls]="id"
+                (click)="abierto.set(!abierto())">
+          <app-icono nombre="intercambio" /> Intercambiar por ({{ alimento().alternativas.length }})
+          <app-icono nombre="abajo" class="flecha" [class.girada]="abierto()" />
+        </button>
+      }
+      @if (intercambiado()) {
+        <button type="button" class="btn-texto deshacer" (click)="deshacer()">
+          <app-icono nombre="deshacer" /> Deshacer intercambio
+        </button>
+      }
+    </div>
+
+    @if (abierto()) {
+      <ul class="alternativas" [id]="id" aria-label="Alimentos que puedes usar en su lugar">
+        @for (alt of alimento().alternativas; track alt.id) {
+          <li>
+            <button type="button" class="alternativa" (click)="elegir(alt.id)">
+              <span class="mini" [class.sin-foto]="!alt.foto || miniaturasFallidas().has(alt.id)">
+                @if (urlMiniatura(alt.foto); as src) {
+                  @if (!miniaturasFallidas().has(alt.id)) {
+                    <img [src]="src" alt="" width="64" height="42" loading="lazy" (error)="miniaturaFallo(alt.id)" />
+                  }
+                }
+              </span>
+              <span class="texto-alt">
+                <span class="nombre-alt">{{ alt.nombre }}</span>
+                <span class="medida-alt">{{ alt.medidaPorPorcion }} ({{ alt.pesoPorPorcionG }} g)</span>
+                @if (alt.fotoReferencia) { <span class="ref-alt">Foto de referencia</span> }
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</article>

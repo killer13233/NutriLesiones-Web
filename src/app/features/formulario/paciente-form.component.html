@@ -1,0 +1,128 @@
+<form [formGroup]="form" (ngSubmit)="enviar()" novalidate aria-labelledby="titulo-form">
+  <h2 id="titulo-form" class="titulo-seccion">Datos del jugador</h2>
+  <p class="leyenda-obligatorio">Los campos con <span aria-hidden="true">*</span><span class="solo-lectores">asterisco</span> son obligatorios.</p>
+
+  <div class="campo">
+    <label for="nombre">Nombre completo <span class="obl" aria-hidden="true">*</span></label>
+    <input #primerCampo id="nombre" type="text" formControlName="nombre" soloLetras autocomplete="off"
+           maxlength="60" [attr.aria-invalid]="invalido('nombre')" aria-describedby="nombre-ayuda nombre-error" />
+    <p id="nombre-ayuda" class="texto-ayuda">Nombre y apellido, solo letras. Ejemplo: Juan Pérez.</p>
+    <p id="nombre-error" class="texto-error" aria-live="polite">{{ mostrarError('nombre') }}</p>
+  </div>
+
+  <div class="fila">
+    <div class="campo">
+      <label for="edad">Edad <span class="obl" aria-hidden="true">*</span></label>
+      <div class="con-sufijo">
+        <input id="edad" type="text" inputmode="numeric" formControlName="edad" soloDigitos [maxDigitos]="2" autocomplete="off"
+               [attr.aria-invalid]="invalido('edad')" aria-describedby="edad-ayuda edad-error" />
+        <span class="sufijo" aria-hidden="true">años</span>
+      </div>
+      <p id="edad-ayuda" class="texto-ayuda">De {{ limites.edad.min }} a {{ limites.edad.max }} años.</p>
+      <p id="edad-error" class="texto-error" aria-live="polite">{{ mostrarError('edad') }}</p>
+    </div>
+
+    <div class="campo">
+      <label for="peso">Peso <span class="obl" aria-hidden="true">*</span></label>
+      <div class="con-sufijo">
+        <input id="peso" type="text" inputmode="decimal" formControlName="peso" soloPeso autocomplete="off"
+               [attr.aria-invalid]="invalido('peso')" aria-describedby="peso-ayuda peso-error" />
+        <span class="sufijo" aria-hidden="true">kg</span>
+      </div>
+      <p id="peso-ayuda" class="texto-ayuda">De {{ limites.peso.min }} a {{ limites.peso.max }} kg. Ejemplo: 65,5.</p>
+      <p id="peso-error" class="texto-error" aria-live="polite">{{ mostrarError('peso') }}</p>
+    </div>
+  </div>
+
+  <div class="fila">
+    <div class="campo">
+      <label for="altura">Altura <span class="obl" aria-hidden="true">*</span></label>
+      <div class="con-sufijo">
+        <input id="altura" type="text" inputmode="numeric" formControlName="altura" soloDigitos [maxDigitos]="3" autocomplete="off"
+               [attr.aria-invalid]="invalido('altura')" aria-describedby="altura-ayuda altura-error" />
+        <span class="sufijo" aria-hidden="true">cm</span>
+      </div>
+      <p id="altura-ayuda" class="texto-ayuda">De {{ limites.altura.min }} a {{ limites.altura.max }} cm.</p>
+      <p id="altura-error" class="texto-error" aria-live="polite">{{ mostrarError('altura') }}</p>
+    </div>
+
+    <div class="campo">
+      <label for="sexo">Sexo <span class="obl" aria-hidden="true">*</span></label>
+      <select id="sexo" formControlName="sexo" [attr.aria-invalid]="invalido('sexo')" aria-describedby="sexo-error">
+        <option value="" disabled>Elige una opción</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Femenino">Femenino</option>
+      </select>
+      <p id="sexo-error" class="texto-error" aria-live="polite">{{ mostrarError('sexo') }}</p>
+    </div>
+  </div>
+
+  <div class="campo">
+    <label for="posicion">Posición en el campo <span class="obl" aria-hidden="true">*</span></label>
+    <select id="posicion" formControlName="posicion" [attr.aria-invalid]="invalido('posicion')" aria-describedby="posicion-error">
+      <option value="" disabled>Elige una posición</option>
+      <option value="Portero">Portero</option>
+      <option value="Defensa">Defensa</option>
+      <option value="Mediocampista">Mediocampista</option>
+      <option value="Delantero">Delantero</option>
+    </select>
+    <p id="posicion-error" class="texto-error" aria-live="polite">{{ mostrarError('posicion') }}</p>
+  </div>
+
+  <div class="campo">
+    <label for="leccion">Lesión <span class="opcional">(opcional)</span></label>
+    <select id="leccion" formControlName="leccion" aria-describedby="leccion-ayuda">
+      <option value="">Sin especificar</option>
+      @for (l of servidor.catalogos()?.lecciones ?? []; track l.id) {
+        <option [value]="l.id">{{ l.nombre }}</option>
+      }
+    </select>
+    <p id="leccion-ayuda" class="texto-ayuda">Solo se muestra en el resumen; no cambia el menú.</p>
+  </div>
+
+  <div class="campo">
+    <div class="etiqueta-ayuda">
+      <label for="fase">Fase de la lesión <span class="obl" aria-hidden="true">*</span></label>
+      <app-ayuda titulo="fase de la lesión"
+                 texto="La fase indica en qué momento de la recuperación está el jugador. Define cuántas kcal por kg de peso necesita." />
+    </div>
+    <select id="fase" formControlName="fase" [attr.aria-invalid]="invalido('fase')" aria-describedby="fase-descripcion fase-error">
+      <option value="" disabled>Elige una fase</option>
+      @for (f of servidor.catalogos()?.fases ?? []; track f.id) {
+        <option [value]="f.id">{{ f.nombre }}</option>
+      }
+    </select>
+    <p id="fase-descripcion" class="texto-ayuda descripcion-fase">{{ descripcionFase() }}</p>
+    <p id="fase-error" class="texto-error" aria-live="polite">{{ mostrarError('fase') }}</p>
+    @if (servidor.errorCatalogos() || (servidor.estado() === 'sin-conexion' && !servidor.catalogos())) {
+      <p class="texto-error" role="alert">
+        No pudimos cargar las fases y lesiones.
+        <button type="button" class="enlace" (click)="servidor.reintentar()">Reintentar</button>
+      </p>
+    }
+  </div>
+
+  <div class="acciones">
+    <button type="submit" class="btn btn-principal" [disabled]="!puedeEnviar()" aria-describedby="nota-envio">
+      {{ store.cargando() ? 'Generando el menú…' : 'Generar menú' }}
+    </button>
+    <button type="button" class="btn btn-secundario" (click)="limpiar()" [disabled]="store.cargando()">
+      <app-icono nombre="basura" /> Limpiar formulario
+    </button>
+  </div>
+  <p id="nota-envio" class="texto-ayuda nota-envio">
+    @if (!puedeEnviar() && !store.cargando()) { Completa los campos obligatorios para generar el menú. }
+    @else { Puedes pulsar Enter para generar el menú. }
+  </p>
+
+  @if (confirmando()) {
+    <div class="confirmacion" role="alertdialog" aria-labelledby="conf-titulo" aria-describedby="conf-texto">
+      <p id="conf-titulo"><strong>¿Borrar los datos del jugador?</strong></p>
+      <p id="conf-texto" class="texto-ayuda">Se vaciarán todos los campos. El menú que ya generaste no se pierde.</p>
+      <div class="acciones">
+        <button type="button" class="btn btn-principal" (click)="confirmarLimpiar()">Sí, limpiar</button>
+        <button type="button" class="btn btn-secundario" (click)="cancelarLimpiar()">Cancelar</button>
+      </div>
+    </div>
+  }
+</form>

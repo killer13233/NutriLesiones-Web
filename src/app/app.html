@@ -1,0 +1,103 @@
+<a class="saltar" href="#contenido">Saltar al menú</a>
+
+<header class="cabecera">
+  <div class="cabecera-int">
+    <app-logo />
+    <div class="estado-servidor" role="status" aria-live="polite">
+      @switch (servidor.estado()) {
+        @case ('listo') { <span class="punto listo" aria-hidden="true"></span> Servidor listo }
+        @case ('conectando') { <span class="punto" aria-hidden="true"></span> Conectando con el servidor… }
+        @case ('despertando') { <span class="punto espera" aria-hidden="true"></span> Despertando el servidor (puede tardar hasta 30 segundos)… }
+        @case ('sin-conexion') {
+          <span class="punto error" aria-hidden="true"></span> Sin conexión con el servidor
+          <button type="button" class="enlace" (click)="servidor.reintentar()">Reintentar</button>
+        }
+      }
+    </div>
+  </div>
+</header>
+
+<div class="diseno">
+  <aside class="lateral" aria-label="Datos del jugador">
+    <p class="presentacion">Menú del día para futbolistas lesionados: cinco comidas con alimentos reales, porciones e intercambios.</p>
+
+    <details class="plegable">
+      <summary>¿Cómo funciona?</summary>
+      <ol>
+        <li>Escribe los datos del jugador; para el menú solo cuentan el peso y la fase.</li>
+        <li>Pulsa «Generar menú» y espera unos segundos.</li>
+        <li>Revisa las cinco comidas y cambia un alimento con «Intercambiar por».</li>
+        <li>Si quieres otra opción, pulsa «Generar otro menú» sin reescribir nada.</li>
+      </ol>
+    </details>
+
+    <app-paciente-form />
+
+    <details class="plegable glosario">
+      <summary>Glosario</summary>
+      <dl>
+        <dt>Porción</dt>
+        <dd>Cantidad fija de un alimento que aporta una cantidad conocida de energía y nutrientes.</dd>
+        <dt>Intercambio</dt>
+        <dd>Otro alimento equivalente que puedes usar en lugar del indicado, con las mismas porciones.</dd>
+        <dt>Medida casera</dt>
+        <dd>La porción expresada con utensilios de cocina: tazas, cucharadas o unidades.</dd>
+      </dl>
+    </details>
+  </aside>
+
+  <main id="contenido" class="principal" tabindex="-1">
+    @if (store.cargando()) {
+      <div class="cargando" role="status" aria-live="polite">
+        <div class="barra-carga" aria-hidden="true"><span></span></div>
+        <p class="cargando-titulo">Generando el menú…</p>
+        @if (store.lento()) {
+          <p class="cargando-texto">El servidor gratuito puede tardar unos 30 segundos en despertar. Gracias por esperar.</p>
+        }
+        <button type="button" class="btn btn-secundario btn-chico" (click)="store.cancelar()">
+          <app-icono nombre="cerrar" /> Cancelar
+        </button>
+      </div>
+    }
+
+    @if (store.error(); as err) {
+      <div class="error-panel" role="alert">
+        <p class="error-titulo"><app-icono nombre="aviso" /> No pudimos generar el menú</p>
+        <p>{{ err.mensaje }}</p>
+        <div class="error-acciones">
+          @if (err.tipo !== 'validacion') {
+            <button type="button" class="btn btn-principal btn-chico" (click)="store.reintentar()">
+              <app-icono nombre="actualizar" /> Reintentar
+            </button>
+          }
+          <button type="button" class="btn btn-secundario btn-chico" (click)="store.descartarError()">Cerrar aviso</button>
+        </div>
+      </div>
+    }
+
+    @if (store.cancelado() && !store.cargando()) {
+      <div class="aviso-panel" role="status">
+        <p>Cancelaste la petición. Tus datos siguen en el formulario.</p>
+        <button type="button" class="btn btn-secundario btn-chico" (click)="store.descartarError()">Entendido</button>
+      </div>
+    }
+
+    @if (store.menu()) {
+      <app-resultado />
+    } @else if (!store.cargando()) {
+      <section class="vacio" aria-labelledby="titulo-vacio">
+        <h2 id="titulo-vacio">Tu menú del día aparecerá aquí</h2>
+        <p>Llena los datos del jugador y pulsa «Generar menú». Verás cada comida con su hora, sus alimentos y sus fotos.</p>
+        <ol class="dia-ejemplo" aria-label="Las cinco comidas del día">
+          @for (c of comidasEjemplo; track c[0]) {
+            <li><span class="h">{{ c[1] }}</span><span class="n">{{ c[0] }}</span></li>
+          }
+        </ol>
+      </section>
+    }
+  </main>
+</div>
+
+<footer class="pie">
+  NutriLesiones · Las cantidades son una guía; ajústalas siempre con el criterio del nutricionista.
+</footer>

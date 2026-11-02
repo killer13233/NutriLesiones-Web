@@ -1,0 +1,91 @@
+<div class="anuncio solo-lectores" role="status" aria-live="polite">{{ anuncio() }}</div>
+
+@if (menu(); as m) {
+  <header class="encabezado-menu">
+    <h2 #encabezado tabindex="-1" class="titulo-menu">
+      Menú {{ m.numero }} para {{ m.paciente.nombre }} · {{ m.paciente.peso | number: '1.0-1' }} kg · fase {{ m.paciente.faseNombre.toLowerCase() }}
+    </h2>
+    <p class="datos-jugador">
+      {{ m.paciente.edad }} años · {{ m.paciente.altura }} cm · {{ m.paciente.sexo }} · {{ m.paciente.posicion }}
+      @if (m.paciente.leccionNombre) { · {{ m.paciente.leccionNombre }} }
+    </p>
+
+    <nav class="navegacion" aria-label="Menús generados">
+      <button type="button" class="btn btn-secundario btn-chico" (click)="store.anterior()" [disabled]="!store.hayAnterior()">
+        <app-icono nombre="izquierda" /> Menú anterior
+      </button>
+      <span class="posicion" aria-live="polite">Menú {{ posicionTexto() }}</span>
+      <button type="button" class="btn btn-secundario btn-chico" (click)="store.siguiente()" [disabled]="!store.haySiguiente()">
+        Menú siguiente <app-icono nombre="derecha" />
+      </button>
+    </nav>
+  </header>
+
+  <section class="tarjeta">
+    <app-barras-adecuacion [adecuacion]="m.plan.adecuacion" [requerimientos]="m.plan.requerimientos" [total]="m.plan.totalDia" />
+  </section>
+
+  @if (m.plan.advertencias.length) {
+    <section class="advertencias" aria-labelledby="titulo-adv">
+      <h3 id="titulo-adv"><app-icono nombre="aviso" /> Avisos del menú</h3>
+      <ul>@for (a of m.plan.advertencias; track $index) { <li>{{ a }}</li> }</ul>
+    </section>
+  }
+
+  <section aria-labelledby="titulo-comidas">
+    <div class="cabecera-comidas">
+      <h3 id="titulo-comidas" class="titulo-seccion">Comidas del día</h3>
+      <app-ayuda titulo="porciones"
+                 texto="Una porción es una cantidad fija de un alimento. La medida casera te dice cuánto es en tazas, cucharadas o unidades. Un intercambio es otro alimento equivalente que puedes usar en su lugar." />
+      @if (cantidadCambios() > 0) {
+        <button type="button" class="btn-texto-sec" (click)="store.deshacerUltimo()">
+          <app-icono nombre="deshacer" /> Deshacer último intercambio
+        </button>
+      }
+    </div>
+
+    <ol class="linea-tiempo">
+      @for (c of m.plan.comidas; track c.id; let ci = $index) {
+        <li class="comida">
+          <div class="hora"><span class="hora-texto">{{ c.horario }}</span></div>
+          <div class="contenido">
+            <h4 class="nombre-comida">{{ c.nombre }}</h4>
+            <p class="kcal-comida"><strong>{{ c.aporte.kcal | number: '1.0-0' }}</strong> kcal</p>
+            <details class="macros-comida">
+              <summary>Ver aporte de nutrientes</summary>
+              <dl>
+                <div><dt>Carbohidratos</dt><dd>{{ c.aporte.cho | number: '1.0-1' }} g</dd></div>
+                <div><dt>Proteína</dt><dd>{{ c.aporte.proteina | number: '1.0-1' }} g</dd></div>
+                <div><dt>Grasa</dt><dd>{{ c.aporte.grasa | number: '1.0-1' }} g</dd></div>
+                <div><dt>Calorías</dt><dd>{{ c.aporte.kcal | number: '1.0-0' }} kcal</dd></div>
+              </dl>
+            </details>
+            <div class="alimentos">
+              @for (a of c.alimentos; track $index; let ai = $index) {
+                <app-alimento-item [alimento]="a" [comida]="ci" [posicion]="ai" />
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section class="total-dia" aria-labelledby="titulo-total">
+    <h3 id="titulo-total" class="titulo-seccion">Total del día</h3>
+    <p class="total-linea">
+      <strong>{{ m.plan.totalDia.kcal | number: '1.0-0' }} kcal</strong> de
+      {{ m.plan.requerimientos.kcal | number: '1.0-0' }} kcal que necesita ({{ m.plan.requerimientos.kcalPorKg }} kcal por kg de peso).
+    </p>
+  </section>
+
+  <div class="acciones-resultado">
+    <button type="button" class="btn btn-principal" (click)="store.generarOtro()" [disabled]="store.cargando()">
+      <app-icono nombre="actualizar" /> Generar otro menú
+    </button>
+    <button type="button" class="btn btn-secundario" (click)="imprimir()">
+      <app-icono nombre="imprimir" /> Imprimir / guardar PDF
+    </button>
+  </div>
+  <p class="texto-ayuda atajo">Atajo: pulsa la tecla <kbd>G</kbd> para generar otro menú (cuando no estés escribiendo en un campo).</p>
+}

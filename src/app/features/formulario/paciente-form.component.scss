@@ -1,0 +1,15 @@
+:host { display: block; }
+.titulo-seccion { font-size: 1.35rem; margin: 0 0 .25rem; }
+.leyenda-obligatorio { margin: 0 0 1.25rem; font-size: .85rem; color: var(--tinta-suave); }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+@media (max-width: 420px) { .fila { grid-template-columns: 1fr; } }
+.etiqueta-ayuda { display: flex; align-items: center; gap: .15rem; label { margin: 0; } }
+.descripcion-fase { min-height: 2.6em; }
+.acciones { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .5rem; }
+.nota-envio { margin-top: .6rem; }
+.confirmacion {
+  margin-top: 1rem; padding: .9rem 1rem; border: 1px solid var(--ambar); border-left-width: 4px;
+  border-radius: 4px; background: color-mix(in srgb, var(--ambar) 12%, var(--papel));
+  p { margin: 0 0 .4rem; }
+}
+.enlace { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }

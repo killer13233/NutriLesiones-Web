@@ -1,0 +1,16 @@
+# dependencias y compilaciones
+node_modules/
+dist/
+.angular/
+out-tsc/
+
+# generado en cada build por scripts/set-env.js (no se sube)
+src/environments/environment.prod.ts
+
+# editor / sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+npm-debug.log
