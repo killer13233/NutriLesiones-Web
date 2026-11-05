@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { PlanStore } from '../../core/services/plan.store';
 import { AyudaComponent } from '../../shared/ui/ayuda.component';
 import { IconoComponent } from '../../shared/ui/icono.component';
@@ -23,12 +23,16 @@ export class ResultadoComponent {
   protected readonly cantidadCambios = computed(() => this.menu()?.cambios.length ?? 0);
 
   constructor() {
-    // Al generar (o cambiar de menú) el foco pasa al encabezado del resultado.
+    // El foco pasa al encabezado solo cuando cambia el NÚMERO de menú (generar o navegar),
+    // no cuando se hace un intercambio dentro del mismo menú.
+    const numero = computed(() => this.menu()?.numero ?? null);
     effect(() => {
-      const m = this.menu();
-      if (!m) return;
-      this.anuncio.set(`Menú ${m.numero} listo para ${m.paciente.nombre}.`);
-      queueMicrotask(() => this.encabezado()?.nativeElement.focus({ preventScroll: false }));
+      if (numero() === null) return;
+      untracked(() => {
+        const m = this.menu();
+        if (m) this.anuncio.set(`Menú ${m.numero} listo para ${m.paciente.nombre}.`);
+      });
+      queueMicrotask(() => this.encabezado()?.nativeElement.focus());
     });
   }
 
