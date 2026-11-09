@@ -21,6 +21,14 @@
     </nav>
   </header>
 
+  <section class="total-dia" aria-labelledby="titulo-total">
+    <h3 id="titulo-total" class="titulo-seccion">Total del día</h3>
+    <p class="total-linea">
+      <strong class="total-kcal">{{ m.plan.totalDia.kcal | number: '1.0-0' }} kcal</strong> de
+      {{ m.plan.requerimientos.kcal | number: '1.0-0' }} kcal que necesita ({{ m.plan.requerimientos.kcalPorKg }} kcal por kg de peso).
+    </p>
+  </section>
+
   <section aria-labelledby="titulo-comidas">
     <div class="cabecera-comidas">
       <h3 id="titulo-comidas" class="titulo-seccion">Comidas del día</h3>
@@ -71,15 +79,8 @@
   }
 
   <details #resumen class="resumen-dia">
-    <summary>Resumen del día y adecuación nutricional (90–110 %)</summary>
+    <summary>Adecuación nutricional (90–110 %)</summary>
     <div class="resumen-contenido">
-      <section class="total-dia" aria-labelledby="titulo-total">
-        <h3 id="titulo-total" class="titulo-seccion">Total del día</h3>
-        <p class="total-linea">
-          <strong>{{ m.plan.totalDia.kcal | number: '1.0-0' }} kcal</strong> de
-          {{ m.plan.requerimientos.kcal | number: '1.0-0' }} kcal que necesita ({{ m.plan.requerimientos.kcalPorKg }} kcal por kg de peso).
-        </p>
-      </section>
       <section class="tarjeta">
         <app-barras-adecuacion [adecuacion]="m.plan.adecuacion" [requerimientos]="m.plan.requerimientos" [total]="m.plan.totalDia" />
       </section>
