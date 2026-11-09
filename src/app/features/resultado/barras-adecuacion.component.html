@@ -1,27 +1,28 @@
-<section class="barras" aria-labelledby="titulo-barras">
-  <div class="cabecera">
-    <h3 id="titulo-barras">Adecuación al requerimiento</h3>
-    <app-ayuda titulo="adecuación"
-               texto="La adecuación compara lo que aporta el menú con lo que el jugador necesita. Entre 90 % y 110 % se considera adecuado." />
-  </div>
-  <p class="leyenda"><span class="muestra" aria-hidden="true"></span> Zona verde = 90 a 110 % del requerimiento.</p>
+:host { display: block; }
+.cabecera { display: flex; align-items: center; gap: .2rem; h3 { margin: 0; font-size: 1.15rem; } }
+.leyenda { display: flex; align-items: center; gap: .5rem; margin: .2rem 0 1rem; font-size: .84rem; color: var(--tinta-suave); }
+.muestra { width: 1.6rem; height: .7rem; border-radius: 2px; background: color-mix(in srgb, var(--verde-lima) 45%, var(--papel)); border: 1px solid var(--verde-hoja); }
 
-  @for (b of barras(); track b.clave) {
-    <div class="fila" [class.fuera]="!b.enRango">
-      <div class="datos">
-        <span class="etiqueta" [attr.title]="b.tooltip">{{ b.nombre }}</span>
-        <span class="cifras">
-          {{ b.obtenido | number: '1.0-1' }} de {{ b.requerido | number: '1.0-1' }} {{ b.unidad }}
-        </span>
-      </div>
-      <div class="pista" role="meter" aria-valuemin="0" [attr.aria-valuemax]="130" [attr.aria-valuenow]="b.pct"
-           [attr.aria-label]="b.nombre + ': ' + (b.pct | number: '1.0-1') + ' % del requerimiento, ' + (b.enRango ? 'dentro' : 'fuera') + ' de la zona adecuada'">
-        <span class="zona" [style.left.%]="zonaInicio" [style.width.%]="zonaAncho"></span>
-        <span class="marcador" [style.left.%]="b.posicion">
-          <span class="valor">{{ b.pct | number: '1.0-1' }} %</span>
-        </span>
-      </div>
-      <p class="estado">{{ b.enRango ? 'Dentro de la zona adecuada' : 'Fuera de la zona adecuada (90 a 110 %)' }}</p>
-    </div>
-  }
-</section>
+.fila { margin-bottom: 1rem; }
+.datos { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; margin-bottom: .2rem; }
+.etiqueta { font-weight: 700; }
+.cifras { font-size: .88rem; color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+
+.pista { position: relative; height: .95rem; margin-top: 1.35rem; border-bottom: 1px solid var(--borde); background: linear-gradient(var(--borde), var(--borde)) bottom / 100% 1px no-repeat; }
+.zona { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--verde-lima) 45%, var(--papel)); border-left: 1px solid var(--verde-hoja); border-right: 1px solid var(--verde-hoja); }
+.marcador { position: absolute; top: -.2rem; bottom: -.2rem; width: 3px; margin-left: -1.5px; background: var(--verde-bosque); border-radius: 2px; }
+.valor {
+  position: absolute; bottom: calc(100% + .1rem); left: 50%; transform: translateX(-50%);
+  font-size: .8rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--verde-bosque);
+}
+.fuera .marcador { background: var(--terracota); }
+.fuera .valor { color: var(--terracota-texto); }
+.estado { margin: .25rem 0 0; font-size: .78rem; color: var(--tinta-suave); }
+.fuera .estado { color: var(--terracota-texto); font-weight: 700; }
+
+@media print {
+  /* Imprimir la zona verde y los marcadores aunque el navegador no imprima fondos */
+  :host, :host * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  :host { break-inside: avoid; page-break-inside: avoid; }
+  .fila { break-inside: avoid; page-break-inside: avoid; }
+}

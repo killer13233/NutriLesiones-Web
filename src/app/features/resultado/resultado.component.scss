@@ -69,4 +69,7 @@ kbd { padding: .05rem .4rem; border: 1px solid var(--borde); border-bottom-width
 @media print {
   .resumen-dia > summary { display: none; }
   .indicacion, .guia-porciones { color: #000; }
+  /* La adecuación nunca se parte entre dos páginas */
+  .resumen-dia, .tarjeta, app-barras-adecuacion { display: block; break-inside: avoid; page-break-inside: avoid; }
+  .total-dia, .advertencias { break-inside: avoid; page-break-inside: avoid; }
 }
