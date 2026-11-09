@@ -98,6 +98,15 @@ export interface PlanResponse {
   guiaPorciones?: string;
 }
 
+/** POST /api/indicacion: texto de cómo combinar los alimentos de UNA comida. */
+export interface IndicacionRequest {
+  comida: string;
+  alimentos: string[];
+}
+export interface IndicacionResponse {
+  indicacion: string | null;
+}
+
 export interface ErrorApi { error: string; }
 
 /** Datos del jugador. Solo viven en memoria; únicamente peso y fase se envían al servidor. */

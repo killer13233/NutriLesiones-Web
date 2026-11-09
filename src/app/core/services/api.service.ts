@@ -2,10 +2,12 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Catalogos, ErrorApi, PlanRequest, PlanResponse } from '../models/api.models';
+import { Catalogos, ErrorApi, IndicacionRequest, IndicacionResponse, PlanRequest, PlanResponse } from '../models/api.models';
 
 /** Tiempo máximo de espera: el servidor gratuito puede tardar ~30 s en despertar. */
 const ESPERA_MAXIMA_MS = 70_000;
+/** La indicación es un complemento: si tarda, se deja el texto anterior. */
+const ESPERA_INDICACION_MS = 15_000;
 
 export type TipoError = 'conexion' | 'lento' | 'validacion' | 'servidor';
 export interface ErrorAmigable { tipo: TipoError; mensaje: string; }
@@ -25,6 +27,10 @@ export class ApiService {
 
   plan(cuerpo: PlanRequest): Observable<PlanResponse> {
     return this.http.post<PlanResponse>(`${this.apiUrl}/api/plan`, cuerpo).pipe(timeout(ESPERA_MAXIMA_MS));
+  }
+
+  indicacion(cuerpo: IndicacionRequest): Observable<IndicacionResponse> {
+    return this.http.post<IndicacionResponse>(`${this.apiUrl}/api/indicacion`, cuerpo).pipe(timeout(ESPERA_INDICACION_MS));
   }
 
   /** La foto viene como ruta relativa ("imagenes/arroz.jpg"). */

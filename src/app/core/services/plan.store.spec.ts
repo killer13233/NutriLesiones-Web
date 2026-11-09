@@ -16,7 +16,7 @@ function plan(semilla: number): PlanResponse {
     requerimientos: { kcal: 2100, carbohidratos: 262, proteina: 105, grasa: 70, kcalPorKg: 30, pctProteina: 20, pctCarbohidratos: 50, pctGrasa: 30 },
     porciones: [], adecuacion: { carbohidratos: 100, proteina: 100, grasa: 100, kcal: 100, enRango90a110: true },
     comidas: [{
-      id: 'desayuno', nombre: 'Desayuno', horario: '07:00–08:00', aporte: { kcal: 500, cho: 60, proteina: 20, grasa: 15 },
+      id: 'desayuno', nombre: 'Desayuno', horario: '07:00–08:00', indicacion: 'Texto original', aporte: { kcal: 500, cho: 60, proteina: 20, grasa: 15 },
       alimentos: [{
         id: 'pan', nombre: 'Pan', grupo: 'Cereales', subgrupo: 'x', porciones: 2, medidaPorPorcion: '1 rebanada',
         pesoPorPorcionG: '30', foto: null, fotoReferencia: null, nota: 'nota', alternativas: [alt('tostada'), alt('galleta')],
@@ -109,5 +109,63 @@ describe('PlanStore', () => {
     store.intercambiar(0, 0, 'tostada');
     store.deshacerUltimo();
     expect(store.menu()!.plan.comidas[0].alimentos[0].id).toBe('pan');
+  });
+
+  describe('indicación de la comida', () => {
+    const pedir = () => http.expectOne((r) => r.url.endsWith('/api/indicacion'));
+
+    it('tras intercambiar pide la indicación de esa comida con los alimentos actuales', () => {
+      generar();
+      store.intercambiar(0, 0, 'tostada');
+      const req = pedir();
+      expect(req.request.body).toEqual({ comida: 'desayuno', alimentos: ['tostada'] });
+      req.flush({ indicacion: 'Puedes preparar tostada.' });
+      expect(store.menu()!.plan.comidas[0].indicacion).toBe('Puedes preparar tostada.');
+    });
+
+    it('tras deshacer vuelve a pedirla con los alimentos originales', () => {
+      generar();
+      store.intercambiar(0, 0, 'tostada');
+      pedir().flush({ indicacion: 'otra' });
+      store.deshacer(0, 0);
+      const req = pedir();
+      expect(req.request.body).toEqual({ comida: 'desayuno', alimentos: ['pan'] });
+      req.flush({ indicacion: 'Texto de pan' });
+      expect(store.menu()!.plan.comidas[0].indicacion).toBe('Texto de pan');
+    });
+
+    it('si responde null no queda texto', () => {
+      generar();
+      store.intercambiar(0, 0, 'tostada');
+      pedir().flush({ indicacion: null });
+      expect(store.menu()!.plan.comidas[0].indicacion).toBeNull();
+    });
+
+    it('si falla deja el texto anterior y no muestra error', () => {
+      generar();
+      store.intercambiar(0, 0, 'tostada');
+      pedir().flush({ error: 'x' }, { status: 500, statusText: 'Server Error' });
+      expect(store.menu()!.plan.comidas[0].indicacion).toBe('Texto original');
+      expect(store.error()).toBeNull();
+    });
+
+    it('el texto se conserva al volver a un menú del historial', () => {
+      generar(1);
+      store.intercambiar(0, 0, 'tostada');
+      pedir().flush({ indicacion: 'Nueva' });
+      generar(2);
+      store.anterior();
+      expect(store.menu()!.plan.comidas[0].indicacion).toBe('Nueva');
+    });
+
+    it('una respuesta vieja no pisa a una más nueva', () => {
+      generar();
+      store.intercambiar(0, 0, 'tostada');
+      const primera = pedir();
+      store.deshacer(0, 0);
+      expect(primera.cancelled).toBe(true);
+      pedir().flush({ indicacion: 'Final' });
+      expect(store.menu()!.plan.comidas[0].indicacion).toBe('Final');
+    });
   });
 });

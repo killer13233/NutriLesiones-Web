@@ -40,6 +40,7 @@ export class PlanStore {
   private sub?: Subscription;
   private aviso?: ReturnType<typeof setTimeout>;
   private ultimo: Paciente | null = null;
+  private readonly indicaciones = new Map<string, Subscription>();
 
   /** Genera un menú nuevo. Sin "semilla": cada llamada devuelve un menú distinto. */
   generar(paciente: Paciente): void {
@@ -99,6 +100,8 @@ export class PlanStore {
 
   /** Reemplaza un alimento por una de sus alternativas conservando las porciones. */
   intercambiar(comida: number, alimento: number, alternativaId: string): void {
+    const antes = this.menu();
+    const cantidad = antes?.cambios.length ?? 0;
     this.modificarMenu((m) => {
       const actual = m.plan.comidas[comida]?.alimentos[alimento];
       const alt = actual?.alternativas.find((a) => a.id === alternativaId);
@@ -127,20 +130,28 @@ export class PlanStore {
         cambios: [...m.cambios, { comida, alimento, previo: actual }],
       };
     });
+    if (antes && (this.menu()?.cambios.length ?? 0) > cantidad) this.refrescarIndicacion(antes.numero, comida);
   }
 
   /** Deshace el último intercambio hecho en ese alimento. */
   deshacer(comida: number, alimento: number): void {
+    const antes = this.menu();
+    const cantidad = antes?.cambios.length ?? 0;
     this.modificarMenu((m) => {
       const pos = this.ultimoCambio(m, (c) => c.comida === comida && c.alimento === alimento);
       if (pos < 0) return m;
       return this.revertir(m, pos);
     });
+    if (antes && (this.menu()?.cambios.length ?? 0) < cantidad) this.refrescarIndicacion(antes.numero, comida);
   }
 
   /** Deshace el último intercambio del menú, sea cual sea. */
   deshacerUltimo(): void {
+    const antes = this.menu();
+    const ultimo = antes?.cambios[antes.cambios.length - 1];
+    if (!antes || !ultimo) return;
     this.modificarMenu((m) => (m.cambios.length ? this.revertir(m, m.cambios.length - 1) : m));
+    this.refrescarIndicacion(antes.numero, ultimo.comida);
   }
 
   intercambiado(comida: number, alimento: number): boolean {
@@ -148,6 +159,35 @@ export class PlanStore {
   }
 
   // ---- Privado -------------------------------------------------------------------
+
+  /**
+   * Pide el texto de "cómo combinar" SOLO de esa comida, con los alimentos que tiene ahora.
+   * Si falla o tarda se deja el texto anterior; si responde null, la comida queda sin indicación.
+   */
+  private refrescarIndicacion(numero: number, comida: number): void {
+    const c = this.historial().find((m) => m.numero === numero)?.plan.comidas[comida];
+    if (!c) return;
+    const clave = `${numero}-${comida}`;
+    this.indicaciones.get(clave)?.unsubscribe(); // una respuesta vieja no pisa a una más nueva
+    const sub = this.api.indicacion({ comida: c.id, alimentos: c.alimentos.map((a) => a.id) }).subscribe({
+      next: (r) => {
+        this.indicaciones.delete(clave);
+        this.fijarIndicacion(numero, comida, r?.indicacion ?? null);
+      },
+      error: () => this.indicaciones.delete(clave),
+    });
+    this.indicaciones.set(clave, sub);
+  }
+
+  private fijarIndicacion(numero: number, comida: number, texto: string | null): void {
+    this.historial.update((h) =>
+      h.map((m) =>
+        m.numero !== numero
+          ? m
+          : { ...m, plan: { ...m.plan, comidas: m.plan.comidas.map((c, i) => (i === comida ? { ...c, indicacion: texto } : c)) } },
+      ),
+    );
+  }
 
   private agregar(paciente: Paciente, plan: PlanResponse): void {
     const nuevo: MenuGuardado = { numero: ++this.contador, paciente, plan, cambios: [] };
