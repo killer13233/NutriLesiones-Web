@@ -23,14 +23,14 @@ describe('validadores del paciente', () => {
   });
 
   describe('enteroEnRango', () => {
-    const edad = enteroEnRango(10, 60);
+    const edad = enteroEnRango(12, 19);
     it('acepta los límites', () => {
-      expect(prueba(edad, '10')).toBeNull();
-      expect(prueba(edad, '60')).toBeNull();
+      expect(prueba(edad, '12')).toBeNull();
+      expect(prueba(edad, '19')).toBeNull();
     });
     it('rechaza fuera de rango', () => {
-      expect(prueba(edad, '9')).toEqual({ rango: { min: 10, max: 60 } });
-      expect(prueba(edad, '61')).toEqual({ rango: { min: 10, max: 60 } });
+      expect(prueba(edad, '11')).toEqual({ rango: { min: 12, max: 19 } });
+      expect(prueba(edad, '20')).toEqual({ rango: { min: 12, max: 19 } });
     });
     it('rechaza texto', () => {
       expect(prueba(edad, '2a')).toEqual({ entero: true });

@@ -2,7 +2,7 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { NOMBRE_MAX, pesoANumero } from '../utils/texto';
 
 export const LIMITES = {
-  edad: { min: 10, max: 60 },
+  edad: { min: 12, max: 19 },
   peso: { min: 25, max: 150 },
   altura: { min: 100, max: 230 },
 } as const;

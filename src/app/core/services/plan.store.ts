@@ -53,7 +53,7 @@ export class PlanStore {
     this.aviso = setTimeout(() => this.lento.set(true), 8000);
 
     this.sub = this.api
-      .plan({ peso: paciente.peso, fase: paciente.fase, ...(paciente.leccion ? { leccion: paciente.leccion } : {}) })
+      .plan({ peso: paciente.peso, fase: paciente.fase, edad: paciente.edad, ...(paciente.leccion ? { leccion: paciente.leccion } : {}) })
       .subscribe({
         next: (plan) => {
           this.terminarCarga();

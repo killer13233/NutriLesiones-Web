@@ -21,17 +21,6 @@
     </nav>
   </header>
 
-  <section class="tarjeta">
-    <app-barras-adecuacion [adecuacion]="m.plan.adecuacion" [requerimientos]="m.plan.requerimientos" [total]="m.plan.totalDia" />
-  </section>
-
-  @if (m.plan.advertencias.length) {
-    <section class="advertencias" aria-labelledby="titulo-adv">
-      <h3 id="titulo-adv"><app-icono nombre="aviso" /> Avisos del menú</h3>
-      <ul>@for (a of m.plan.advertencias; track $index) { <li>{{ a }}</li> }</ul>
-    </section>
-  }
-
   <section aria-labelledby="titulo-comidas">
     <div class="cabecera-comidas">
       <h3 id="titulo-comidas" class="titulo-seccion">Comidas del día</h3>
@@ -44,6 +33,8 @@
       }
     </div>
 
+    <p class="guia-porciones">{{ m.plan.guiaPorciones || guiaRespaldo }}</p>
+
     <ol class="linea-tiempo">
       @for (c of m.plan.comidas; track c.id; let ci = $index) {
         <li class="comida">
@@ -51,6 +42,7 @@
           <div class="contenido">
             <h4 class="nombre-comida">{{ c.nombre }}</h4>
             <p class="kcal-comida"><strong>{{ c.aporte.kcal | number: '1.0-0' }}</strong> kcal</p>
+            @if (c.indicacion) { <p class="indicacion">{{ c.indicacion }}</p> }
             <details class="macros-comida">
               <summary>Ver aporte de nutrientes</summary>
               <dl>
@@ -71,13 +63,28 @@
     </ol>
   </section>
 
-  <section class="total-dia" aria-labelledby="titulo-total">
-    <h3 id="titulo-total" class="titulo-seccion">Total del día</h3>
-    <p class="total-linea">
-      <strong>{{ m.plan.totalDia.kcal | number: '1.0-0' }} kcal</strong> de
-      {{ m.plan.requerimientos.kcal | number: '1.0-0' }} kcal que necesita ({{ m.plan.requerimientos.kcalPorKg }} kcal por kg de peso).
-    </p>
-  </section>
+  @if (m.plan.advertencias.length) {
+    <section class="advertencias" aria-labelledby="titulo-adv">
+      <h3 id="titulo-adv"><app-icono nombre="aviso" /> Avisos del menú</h3>
+      <ul>@for (a of m.plan.advertencias; track $index) { <li>{{ a }}</li> }</ul>
+    </section>
+  }
+
+  <details #resumen class="resumen-dia">
+    <summary>Resumen del día y adecuación nutricional (90–110 %)</summary>
+    <div class="resumen-contenido">
+      <section class="total-dia" aria-labelledby="titulo-total">
+        <h3 id="titulo-total" class="titulo-seccion">Total del día</h3>
+        <p class="total-linea">
+          <strong>{{ m.plan.totalDia.kcal | number: '1.0-0' }} kcal</strong> de
+          {{ m.plan.requerimientos.kcal | number: '1.0-0' }} kcal que necesita ({{ m.plan.requerimientos.kcalPorKg }} kcal por kg de peso).
+        </p>
+      </section>
+      <section class="tarjeta">
+        <app-barras-adecuacion [adecuacion]="m.plan.adecuacion" [requerimientos]="m.plan.requerimientos" [total]="m.plan.totalDia" />
+      </section>
+    </div>
+  </details>
 
   <div class="acciones-resultado">
     <button type="button" class="btn btn-principal" (click)="store.generarOtro()" [disabled]="store.cargando()">

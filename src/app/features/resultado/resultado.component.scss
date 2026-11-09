@@ -9,11 +9,20 @@
 .tarjeta { background: var(--papel); border: 1px solid var(--borde); border-radius: 6px; padding: 1.1rem 1.25rem .4rem; margin-bottom: 1.5rem; }
 
 .advertencias {
-  margin-bottom: 1.5rem; padding: .8rem 1rem; border: 1px solid var(--ambar); border-left-width: 4px; border-radius: 4px;
+  margin: 1rem 0 1.5rem; padding: .8rem 1rem; border: 1px solid var(--ambar); border-left-width: 4px; border-radius: 4px;
   background: color-mix(in srgb, var(--ambar) 12%, var(--papel));
   h3 { display: flex; align-items: center; gap: .4rem; margin: 0 0 .3rem; font-size: 1rem; font-family: var(--fuente-texto); font-weight: 800; }
   ul { margin: 0; padding-left: 1.2rem; }
 }
+
+.guia-porciones { margin: 0 0 1.25rem; max-width: 46rem; font-size: .95rem; color: var(--tinta-suave); }
+.indicacion { margin: .3rem 0 .4rem; max-width: 42rem; font-size: .95rem; line-height: 1.5; color: var(--tinta-suave); }
+.resumen-dia {
+  margin: 0 0 1.5rem; border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); padding: .7rem 0;
+  summary { cursor: pointer; font-weight: 700; color: var(--verde-bosque); }
+  summary:focus-visible { outline: 3px solid var(--verde-bosque); outline-offset: 3px; }
+}
+.resumen-contenido { margin-top: 1rem; }
 
 .cabecera-comidas { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .5rem; margin-bottom: .5rem; .titulo-seccion { margin: 0; } }
 .btn-texto-sec {
@@ -47,8 +56,13 @@
   dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
 }
 
-.total-dia { margin: .5rem 0 1.5rem; padding-top: 1rem; border-top: 1px solid var(--borde); .titulo-seccion { margin: 0 0 .25rem; } }
+.total-dia { margin: 0 0 1.25rem; .titulo-seccion { margin: 0 0 .25rem; } }
 .total-linea { margin: 0; font-variant-numeric: tabular-nums; }
 .acciones-resultado { display: flex; flex-wrap: wrap; gap: .6rem; }
 .atajo { margin-top: .75rem; }
 kbd { padding: .05rem .4rem; border: 1px solid var(--borde); border-bottom-width: 2px; border-radius: 3px; background: var(--papel); font: inherit; font-weight: 700; font-size: .85em; }
+
+@media print {
+  .resumen-dia > summary { display: none; }
+  .indicacion, .guia-porciones { color: #000; }
+}

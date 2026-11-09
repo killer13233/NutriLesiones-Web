@@ -127,7 +127,7 @@ export class PacienteFormComponent implements OnInit {
     if (e['required']) {
       return {
         nombre: 'Escribe el nombre completo. Por ejemplo: Juan Pérez.',
-        edad: 'Escribe la edad en años. Por ejemplo: 24.',
+        edad: 'Escribe la edad en años. Por ejemplo: 16.',
         peso: 'Escribe el peso en kg. Por ejemplo: 65,5.',
         altura: 'Escribe la altura en cm. Por ejemplo: 178.',
         sexo: 'Elige una opción de la lista.',
@@ -141,7 +141,7 @@ export class PacienteFormComponent implements OnInit {
       if (e['largo']) return 'El nombre puede tener hasta 60 caracteres.';
       return 'Escribe nombre y apellido, cada uno de al menos 2 letras. Por ejemplo: Juan Pérez.';
     }
-    if (c === 'edad') return `La edad debe estar entre ${LIMITES.edad.min} y ${LIMITES.edad.max} años. Escribe solo números, por ejemplo 24.`;
+    if (c === 'edad') return `La edad debe estar entre ${LIMITES.edad.min} y ${LIMITES.edad.max} años. Escribe solo números, por ejemplo 16.`;
     if (c === 'altura') return `La altura debe estar entre ${LIMITES.altura.min} y ${LIMITES.altura.max} cm. Escribe solo números, por ejemplo 178.`;
     if (c === 'peso') {
       if (e['formatoPeso']) return 'Usa un solo decimal. Escribe por ejemplo 65,5.';

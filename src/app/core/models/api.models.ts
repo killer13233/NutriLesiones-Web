@@ -14,6 +14,7 @@ export interface Catalogos {
 export interface PlanRequest {
   peso: number;
   fase: FaseId;
+  edad?: number;
   leccion?: string;
   semilla?: number;
 }
@@ -78,6 +79,7 @@ export interface Comida {
   id: string;
   nombre: string;
   horario: string;
+  indicacion?: string | null;
   aporte: Macros;
   alimentos: AlimentoMenu[];
 }
@@ -93,6 +95,7 @@ export interface PlanResponse {
   comidas: Comida[];
   totalDia: Macros;
   advertencias: string[];
+  guiaPorciones?: string;
 }
 
 export interface ErrorApi { error: string; }

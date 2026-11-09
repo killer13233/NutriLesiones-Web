@@ -5,7 +5,7 @@ import { Paciente, PlanResponse } from '../models/api.models';
 import { MAX_HISTORIAL, PlanStore } from './plan.store';
 
 const paciente: Paciente = {
-  nombre: 'Juan Pérez', edad: 24, peso: 70, altura: 178, sexo: 'Masculino', posicion: 'Defensa',
+  nombre: 'Juan Pérez', edad: 16, peso: 70, altura: 178, sexo: 'Masculino', posicion: 'Defensa',
   leccion: '', leccionNombre: '', fase: 'inflamatoria', faseNombre: 'Inflamatoria',
 };
 
@@ -41,10 +41,10 @@ describe('PlanStore', () => {
     http.expectOne((r) => r.url.endsWith('/api/plan')).flush(plan(semilla));
   }
 
-  it('envía solo peso y fase (nada de nombre, edad ni altura)', () => {
+  it('envía peso, fase y edad (nada de nombre ni altura)', () => {
     store.generar(paciente);
     const req = http.expectOne((r) => r.url.endsWith('/api/plan'));
-    expect(req.request.body).toEqual({ peso: 70, fase: 'inflamatoria' });
+    expect(req.request.body).toEqual({ peso: 70, fase: 'inflamatoria', edad: 16 });
     req.flush(plan(1));
     expect(store.menu()?.numero).toBe(1);
   });
